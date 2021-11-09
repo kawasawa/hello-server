@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    // JavaScript のバージョン
+    "target": "es6",
+    // モジュールパターン
+    "module": "commonjs",
+    // モジュール解決の方法
+    "moduleResolution": "node",
+    // 厳密な型チェック
+    "strict": true,
+    // 型定義ファイルのチェックをスキップ
+    "skipLibCheck": true,
+    // default export されていないモジュールに対する default import の型チェックを無効化
+    "allowSyntheticDefaultImports": true,
+    // default export されていないモジュールに対する default import の許容
+    "esModuleInterop": true,
+    // JSON モジュールの解決
+    "resolveJsonModule": true,
+    // 参照モジュールパスの大文字小文字を区別
+    "forceConsistentCasingInFileNames": true,
+    // switch 分における break のない case の許容
+    "noFallthroughCasesInSwitch": true,
+    // 出力ディレクトリ
+    "outDir": "dist/app",
+    // 型定義のパス
+    "typeRoots": ["src/@types", "node_modules/@types"]
+  },
+  "include": ["src"],
+  "exclude": ["**/*.test.ts"]
+}

@@ -1,0 +1,11 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "pwa-node",
+      "request": "attach",
+      "name": "Debug Runnning Node Process",
+      "processId": "${command:PickProcess}"
+    }
+  ]
+}

@@ -1,0 +1,2924 @@
+{
+	"info": {
+		"_postman_id": "53452965-fe11-4bf1-8e17-7168a2b924ae",
+		"name": "hello-server",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "正常系: サインアップ",
+					"item": [
+						{
+							"name": "サインアップ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signup",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] サインイン",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											"\r",
+											"pm.test(\"have token\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"token\");\r",
+											"    pm.expect(jsonData.token).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"have user\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"user\");\r",
+											"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"validate email\", () =>\r",
+											"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+											"\r",
+											"pm.test(\"validate name\", () =>\r",
+											"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+											"\r",
+											"pm.test(\"have verified\", () => {\r",
+											"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+											"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"access_token\", jsonData.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signin",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] 退会",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{access_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/withdraw",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"withdraw"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "異常系: サインアップ (登録済みアカウント)",
+					"item": [
+						{
+							"name": "[前処理] サインアップ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signup",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "サインアップ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(409));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(false));\r",
+											"\r",
+											"pm.test(\"have message\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\");\r",
+											"    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signup",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] サインイン",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											"\r",
+											"pm.test(\"have token\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"token\");\r",
+											"    pm.expect(jsonData.token).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"have user\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"user\");\r",
+											"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"validate email\", () =>\r",
+											"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+											"\r",
+											"pm.test(\"validate name\", () =>\r",
+											"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+											"\r",
+											"pm.test(\"have verified\", () => {\r",
+											"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+											"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"access_token\", jsonData.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signin",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] 退会",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{access_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/withdraw",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"withdraw"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "異常系: サインアップ (必須項目の不足)",
+					"item": [
+						{
+							"name": "サインアップ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(400));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(false));\r",
+											"\r",
+											"pm.test(\"validate message\", () => \r",
+											"    pm.expect(jsonData.message).to.contains([\"name\"]));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signup",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "異常系: サインアップ (メールアドレスの書式不正)",
+					"item": [
+						{
+							"name": "サインアップ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(400));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(false));\r",
+											"\r",
+											"pm.test(\"validate message\", () => \r",
+											"    pm.expect(jsonData.message).to.contain(\"email\"));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"invalid_email\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signup",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "異常系: サインアップ (パスワードの制約不正)",
+					"item": [
+						{
+							"name": "サインアップ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(400));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(false));\r",
+											"\r",
+											"pm.test(\"validate message\", () => \r",
+											"    pm.expect(jsonData.message).to.contain(\"password\"));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"invalid_password\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signup",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "正常系: サインイン",
+					"item": [
+						{
+							"name": "[前処理] サインアップ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signup",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "サインイン",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											"\r",
+											"pm.test(\"have token\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"token\");\r",
+											"    pm.expect(jsonData.token).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"have user\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"user\");\r",
+											"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"validate email\", () =>\r",
+											"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+											"\r",
+											"pm.test(\"validate name\", () =>\r",
+											"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+											"\r",
+											"pm.test(\"have verified\", () => {\r",
+											"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+											"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"access_token\", jsonData.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signin",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "サインアウト",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{access_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signout",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signout"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] サインイン",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											"\r",
+											"pm.test(\"have token\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"token\");\r",
+											"    pm.expect(jsonData.token).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"have user\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"user\");\r",
+											"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"validate email\", () =>\r",
+											"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+											"\r",
+											"pm.test(\"validate name\", () =>\r",
+											"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+											"\r",
+											"pm.test(\"have verified\", () => {\r",
+											"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+											"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"access_token\", jsonData.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signin",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] 退会",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{access_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/withdraw",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"withdraw"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "異常系: サインイン (未登録のメールアドレス)",
+					"item": [
+						{
+							"name": "[前処理] サインアップ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signup",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "サインイン",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(401));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(false));\r",
+											"\r",
+											"pm.test(\"have message\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\");\r",
+											"    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"not have token\", () => \r",
+											"    pm.expect(jsonData).to.not.have.property(\"token\"));"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"invalid@example.com\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signin",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] サインイン",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											"\r",
+											"pm.test(\"have token\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"token\");\r",
+											"    pm.expect(jsonData.token).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"have user\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"user\");\r",
+											"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"validate email\", () =>\r",
+											"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+											"\r",
+											"pm.test(\"validate name\", () =>\r",
+											"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+											"\r",
+											"pm.test(\"have verified\", () => {\r",
+											"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+											"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"access_token\", jsonData.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signin",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] 退会",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{access_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/withdraw",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"withdraw"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "異常系: サインイン (パスワードの不一致)",
+					"item": [
+						{
+							"name": "[前処理] サインアップ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signup",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "サインイン",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(401));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(false));\r",
+											"\r",
+											"pm.test(\"have message\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\");\r",
+											"    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"not have token\", () => \r",
+											"    pm.expect(jsonData).to.not.have.property(\"token\"));"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"invalid\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signin",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] サインイン",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											"\r",
+											"pm.test(\"have token\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"token\");\r",
+											"    pm.expect(jsonData.token).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"have user\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"user\");\r",
+											"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"validate email\", () =>\r",
+											"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+											"\r",
+											"pm.test(\"validate name\", () =>\r",
+											"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+											"\r",
+											"pm.test(\"have verified\", () => {\r",
+											"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+											"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"access_token\", jsonData.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signin",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] 退会",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{access_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/withdraw",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"withdraw"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "正常系: 本人確認メール再送信",
+					"item": [
+						{
+							"name": "[前処理] サインアップ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signup",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[前処理] サインイン",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											"\r",
+											"pm.test(\"have token\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"token\");\r",
+											"    pm.expect(jsonData.token).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"have user\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"user\");\r",
+											"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"validate email\", () =>\r",
+											"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+											"\r",
+											"pm.test(\"validate name\", () =>\r",
+											"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+											"\r",
+											"pm.test(\"have verified\", () => {\r",
+											"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+											"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"access_token\", jsonData.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signin",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "本人確認",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{access_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{server_uri}}/api/auth/identify",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"identify"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] 退会",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{access_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/withdraw",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"withdraw"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "異常系: 本人確認 (不正なトークン)",
+					"item": [
+						{
+							"name": "[前処理] サインアップ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signup",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[前処理] サインイン",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											"\r",
+											"pm.test(\"have token\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"token\");\r",
+											"    pm.expect(jsonData.token).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"have user\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"user\");\r",
+											"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"validate email\", () =>\r",
+											"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+											"\r",
+											"pm.test(\"validate name\", () =>\r",
+											"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+											"\r",
+											"pm.test(\"have verified\", () => {\r",
+											"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+											"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"access_token\", jsonData.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signin",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "本人確認",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(401));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(false));\r",
+											"\r",
+											"pm.test(\"have message\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\");\r",
+											"    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "invalid_access_token",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{server_uri}}/api/auth/identify",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"identify"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] 退会",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{access_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/withdraw",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"withdraw"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "正常系: パスワード再設定 (サインイン後)",
+					"item": [
+						{
+							"name": "[前処理] サインアップ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signup",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "パスワード再設定",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/reset-password",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"reset-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] サインイン",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											"\r",
+											"pm.test(\"have token\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"token\");\r",
+											"    pm.expect(jsonData.token).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"have user\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"user\");\r",
+											"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"validate email\", () =>\r",
+											"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+											"\r",
+											"pm.test(\"validate name\", () =>\r",
+											"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+											"\r",
+											"pm.test(\"have verified\", () => {\r",
+											"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+											"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"access_token\", jsonData.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signin",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] 退会",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{access_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/withdraw",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"withdraw"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "正常系: パスワード再設定 (サインイン後)",
+					"item": [
+						{
+							"name": "[前処理] サインアップ",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signup",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[前処理] サインイン",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											"\r",
+											"pm.test(\"have token\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"token\");\r",
+											"    pm.expect(jsonData.token).to.be.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"have user\", () => {\r",
+											"    pm.expect(jsonData).to.have.property(\"user\");\r",
+											"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"validate email\", () =>\r",
+											"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+											"\r",
+											"pm.test(\"validate name\", () =>\r",
+											"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+											"\r",
+											"pm.test(\"have verified\", () => {\r",
+											"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+											"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"access_token\", jsonData.token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/signin",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"signin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "パスワード再設定",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"{{email}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/reset-password",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"reset-password"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "[後処理] 退会",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"validate status code\", () => \r",
+											"    pm.response.to.have.status(200));\r",
+											"\r",
+											"pm.test(\"validate success\", () =>\r",
+											"    pm.expect(jsonData.success).to.eql(true));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{access_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"password\": \"{{password}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{server_uri}}/api/auth/withdraw",
+									"host": [
+										"{{server_uri}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"withdraw"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "resource",
+			"item": [
+				{
+					"name": "user",
+					"item": [
+						{
+							"name": "正常系: ユーザ情報取得",
+							"item": [
+								{
+									"name": "[前処理] サインアップ",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"validate status code\", () => \r",
+													"    pm.response.to.have.status(200));\r",
+													"\r",
+													"pm.test(\"validate success\", () =>\r",
+													"    pm.expect(jsonData.success).to.eql(true));\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{server_uri}}/api/auth/signup",
+											"host": [
+												"{{server_uri}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"signup"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "[前処理] サインイン",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"validate status code\", () => \r",
+													"    pm.response.to.have.status(200));\r",
+													"\r",
+													"pm.test(\"validate success\", () =>\r",
+													"    pm.expect(jsonData.success).to.eql(true));\r",
+													"\r",
+													"pm.test(\"have token\", () => {\r",
+													"    pm.expect(jsonData).to.have.property(\"token\");\r",
+													"    pm.expect(jsonData.token).to.be.a(\"string\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"have user\", () => {\r",
+													"    pm.expect(jsonData).to.have.property(\"user\");\r",
+													"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"validate email\", () =>\r",
+													"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+													"\r",
+													"pm.test(\"validate name\", () =>\r",
+													"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+													"\r",
+													"pm.test(\"have verified\", () => {\r",
+													"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+													"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+													"});\r",
+													"\r",
+													"pm.environment.set(\"access_token\", jsonData.token);"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{server_uri}}/api/auth/signin",
+											"host": [
+												"{{server_uri}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"signin"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "ユーザ情報取得",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"validate status code\", () => \r",
+													"    pm.response.to.have.status(200));\r",
+													"\r",
+													"pm.test(\"validate success\", () =>\r",
+													"    pm.expect(jsonData.success).to.eql(true));\r",
+													"\r",
+													"pm.test(\"have user\", () => {\r",
+													"    pm.expect(jsonData).to.have.property(\"user\");\r",
+													"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"validate email\", () =>\r",
+													"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+													"\r",
+													"pm.test(\"validate name\", () =>\r",
+													"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+													"\r",
+													"pm.test(\"have verified\", () => {\r",
+													"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+													"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"protocolProfileBehavior": {
+										"disabledSystemHeaders": {}
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "x-access-token",
+												"value": "{{access_token}}",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{server_uri}}/api/user",
+											"host": [
+												"{{server_uri}}"
+											],
+											"path": [
+												"api",
+												"user"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "[後処理] 退会",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"validate status code\", () => \r",
+													"    pm.response.to.have.status(200));\r",
+													"\r",
+													"pm.test(\"validate success\", () =>\r",
+													"    pm.expect(jsonData.success).to.eql(true));\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "x-access-token",
+												"value": "{{access_token}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"password\": \"{{password}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{server_uri}}/api/auth/withdraw",
+											"host": [
+												"{{server_uri}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"withdraw"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "正常系: ユーザ情報更新",
+							"item": [
+								{
+									"name": "[前処理] サインアップ",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"validate status code\", () => \r",
+													"    pm.response.to.have.status(200));\r",
+													"\r",
+													"pm.test(\"validate success\", () =>\r",
+													"    pm.expect(jsonData.success).to.eql(true));\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{server_uri}}/api/auth/signup",
+											"host": [
+												"{{server_uri}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"signup"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "[前処理] サインイン",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"validate status code\", () => \r",
+													"    pm.response.to.have.status(200));\r",
+													"\r",
+													"pm.test(\"validate success\", () =>\r",
+													"    pm.expect(jsonData.success).to.eql(true));\r",
+													"\r",
+													"pm.test(\"have token\", () => {\r",
+													"    pm.expect(jsonData).to.have.property(\"token\");\r",
+													"    pm.expect(jsonData.token).to.be.a(\"string\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"have user\", () => {\r",
+													"    pm.expect(jsonData).to.have.property(\"user\");\r",
+													"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"validate email\", () =>\r",
+													"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+													"\r",
+													"pm.test(\"validate name\", () =>\r",
+													"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+													"\r",
+													"pm.test(\"have verified\", () => {\r",
+													"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+													"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+													"});\r",
+													"\r",
+													"pm.environment.set(\"access_token\", jsonData.token);"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{server_uri}}/api/auth/signin",
+											"host": [
+												"{{server_uri}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"signin"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "ユーザ情報更新",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"validate status code\", () => \r",
+													"    pm.response.to.have.status(200));\r",
+													"\r",
+													"pm.test(\"validate success\", () =>\r",
+													"    pm.expect(jsonData.success).to.eql(true));\r",
+													"\r",
+													"pm.test(\"have user\", () => {\r",
+													"    pm.expect(jsonData).to.have.property(\"user\");\r",
+													"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"validate email\", () =>\r",
+													"    pm.expect(jsonData.user.email).to.eql(\"new_email@example.com\"));\r",
+													"\r",
+													"pm.test(\"validate name\", () =>\r",
+													"    pm.expect(jsonData.user.name).to.eql(\"new_name\"));\r",
+													"\r",
+													"pm.test(\"have verified\", () => {\r",
+													"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+													"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+													"});"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "x-access-token",
+												"value": "{{access_token}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"name\": \"new_name\",\r\n    \"email\": \"new_email@example.com\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{server_uri}}/api/user",
+											"host": [
+												"{{server_uri}}"
+											],
+											"path": [
+												"api",
+												"user"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "[後処理] 退会",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"validate status code\", () => \r",
+													"    pm.response.to.have.status(200));\r",
+													"\r",
+													"pm.test(\"validate success\", () =>\r",
+													"    pm.expect(jsonData.success).to.eql(true));\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "x-access-token",
+												"value": "{{access_token}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"password\": \"{{password}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{server_uri}}/api/auth/withdraw",
+											"host": [
+												"{{server_uri}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"withdraw"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "異常系: ユーザ情報更新 (メールアドレスの書式不正",
+							"item": [
+								{
+									"name": "[前処理] サインアップ",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"validate status code\", () => \r",
+													"    pm.response.to.have.status(200));\r",
+													"\r",
+													"pm.test(\"validate success\", () =>\r",
+													"    pm.expect(jsonData.success).to.eql(true));\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{server_uri}}/api/auth/signup",
+											"host": [
+												"{{server_uri}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"signup"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "[前処理] サインイン",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"validate status code\", () => \r",
+													"    pm.response.to.have.status(200));\r",
+													"\r",
+													"pm.test(\"validate success\", () =>\r",
+													"    pm.expect(jsonData.success).to.eql(true));\r",
+													"\r",
+													"pm.test(\"have token\", () => {\r",
+													"    pm.expect(jsonData).to.have.property(\"token\");\r",
+													"    pm.expect(jsonData.token).to.be.a(\"string\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"have user\", () => {\r",
+													"    pm.expect(jsonData).to.have.property(\"user\");\r",
+													"    pm.expect(jsonData.user).to.be.a(\"object\");\r",
+													"});\r",
+													"\r",
+													"pm.test(\"validate email\", () =>\r",
+													"    pm.expect(jsonData.user.email).to.eql(pm.environment.get(\"email\")));\r",
+													"\r",
+													"pm.test(\"validate name\", () =>\r",
+													"    pm.expect(jsonData.user.name).to.eql(pm.environment.get(\"name\")));\r",
+													"\r",
+													"pm.test(\"have verified\", () => {\r",
+													"    pm.expect(jsonData.user).to.have.property(\"verified\");\r",
+													"    pm.expect(jsonData.user.verified).to.be.a(\"boolean\");\r",
+													"});\r",
+													"\r",
+													"pm.environment.set(\"access_token\", jsonData.token);"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{server_uri}}/api/auth/signin",
+											"host": [
+												"{{server_uri}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"signin"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "ユーザ情報更新",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"validate status code\", () => \r",
+													"    pm.response.to.have.status(400));\r",
+													"\r",
+													"pm.test(\"validate success\", () =>\r",
+													"    pm.expect(jsonData.success).to.eql(false));\r",
+													"\r",
+													"pm.test(\"validate message\", () => \r",
+													"    pm.expect(jsonData.message).to.contain(\"email\"));\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "x-access-token",
+												"value": "{{access_token}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"name\": \"new_name\",\r\n    \"email\": \"invalid_email\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{server_uri}}/api/user",
+											"host": [
+												"{{server_uri}}"
+											],
+											"path": [
+												"api",
+												"user"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "[後処理] 退会",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"const jsonData = pm.response.json();\r",
+													"\r",
+													"pm.test(\"validate status code\", () => \r",
+													"    pm.response.to.have.status(200));\r",
+													"\r",
+													"pm.test(\"validate success\", () =>\r",
+													"    pm.expect(jsonData.success).to.eql(true));\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "x-access-token",
+												"value": "{{access_token}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"password\": \"{{password}}\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{server_uri}}/api/auth/withdraw",
+											"host": [
+												"{{server_uri}}"
+											],
+											"path": [
+												"api",
+												"auth",
+												"withdraw"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "バージョン情報",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"validate status code\", () => \r",
+							"    pm.response.to.have.status(200));\r",
+							"\r",
+							"pm.test(\"validate success\", () =>\r",
+							"    pm.expect(jsonData.success).to.eql(true));\r",
+							"\r",
+							"pm.test(\"have name\", () => {\r",
+							"    pm.expect(jsonData).to.have.property(\"name\");\r",
+							"    pm.expect(jsonData.name).to.be.a(\"string\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"have version\", () => {\r",
+							"    pm.expect(jsonData).to.have.property(\"version\");\r",
+							"    pm.expect(jsonData.version).to.be.a(\"string\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"have isProd\", () => {\r",
+							"    pm.expect(jsonData).to.have.property(\"isProd\");\r",
+							"    pm.expect(jsonData.isProd).to.be.a(\"boolean\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server_uri}}/api/version",
+					"host": [
+						"{{server_uri}}"
+					],
+					"path": [
+						"api",
+						"version"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
