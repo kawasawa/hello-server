@@ -218,7 +218,7 @@ paths:
           description: 認証情報に不備があります。
         '403':
           description: このメールアドレスは認証済みです。
-      operationId: post-autn-identify
+      operationId: post-auth-identify
       description: 本人確認メールを送信します。
       parameters:
         - schema:

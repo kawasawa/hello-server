@@ -5,7 +5,7 @@ import Auth from './models/Auth';
 import PasswordReset from './models/PasswordReset';
 import User from './models/User';
 
-export const initilizeDatabase = () => {
+export const initializeDatabase = () => {
   Auth.initialize(dbInstance);
   PasswordReset.initialize(dbInstance);
   User.initialize(dbInstance);

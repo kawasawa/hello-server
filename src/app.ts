@@ -13,7 +13,7 @@ import verifyAccessToken from './middlewares/verifyAccessToken';
 import auth from './routes/auth/auth';
 import user from './routes/resource/user';
 
-export const initilizeApp = () => {
+export const initializeApp = () => {
   const app = express();
 
   // ログ出力
