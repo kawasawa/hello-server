@@ -2,6 +2,7 @@ import Boom from 'boom';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
+import helmet from 'helmet';
 import morgan from 'morgan';
 import mustacheExpress from 'mustache-express';
 import util from 'util';
@@ -27,6 +28,9 @@ export const initilizeApp = () => {
 
   // CORS 対応
   app.use(cors({ origin: ORIGIN, credentials: true, methods: 'GET,POST,PATCH,DELETE' }));
+
+  // セキュリティヘッダの追加
+  app.use(helmet());
 
   // SSL 対応 (本番環境用)
   app.all('*', (req: Request, res: Response, next: NextFunction) => {
