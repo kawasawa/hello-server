@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@sendgrid/mail": "^7.4.7",
+    "@sendgrid/mail": "^8.0.0",
     "@types/bcrypt": "^5.0.0",
     "@types/boom": "^7.3.1",
     "@types/cookie-parser": "^1.4.2",
